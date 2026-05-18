@@ -33,11 +33,19 @@ jobs:
       - name: Run ESLint
         run: npx eslint .
 
-      # Step 5: Run npm audit (security vulnerability check)
+      # Step 5: Run Snyk security scan (from awesome-sca)
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+      # Step 6: Run npm audit (backup security check)
       - name: Run npm audit
         run: npm audit --audit-level=moderate
-        continue-on-error: true  # Don't block on audit warnings
+        continue-on-error: true
 
-      # Step 6: Check for outdated dependencies
+      # Step 7: Check for outdated dependencies
       - name: Check outdated dependencies
         run: npm outdated || true
