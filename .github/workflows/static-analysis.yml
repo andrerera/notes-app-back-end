@@ -38,7 +38,7 @@ jobs:
         run: |
           npm install -g snyk
           snyk auth ${{ secrets.SNYK_TOKEN }}
-          snyk code test --severity-threshold=high
+          snyk code test
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -46,7 +46,7 @@ jobs:
       # Step 6: Run Snyk SCA (dependency scan)
       - name: Run Snyk SCA scan
         run: |
-          snyk test --severity-threshold=high
+          snyk test
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
