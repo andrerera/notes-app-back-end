@@ -25,7 +25,7 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      # Step 3: Install dependencies (includes ESLint from package.json)
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm ci
 
@@ -33,11 +33,29 @@ jobs:
       - name: Run ESLint
         run: npx eslint .
 
-      # Step 5: Run npm audit (from awesome-sca)
+      # Step 5: Run Snyk SAST scan (from awesome-sca)
+      - name: Run Snyk SAST scan
+        run: |
+          npm install -g snyk
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+          snyk code test --severity-threshold=high
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      # Step 6: Run Snyk SCA (dependency scan)
+      - name: Run Snyk SCA scan
+        run: |
+          snyk test --severity-threshold=high
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      # Step 7: Run npm audit (backup)
       - name: Run npm audit
         run: npm audit --audit-level=moderate
         continue-on-error: true
 
-      # Step 6: Check for outdated dependencies
+      # Step 8: Check for outdated dependencies
       - name: Check outdated dependencies
         run: npm outdated || true
